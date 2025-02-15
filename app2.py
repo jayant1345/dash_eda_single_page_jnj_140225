@@ -36,7 +36,7 @@ app.layout = dbc.Container([
             dcc.Tab(label="Missing Values", value="missing"),
             dcc.Tab(label="Duplicate Records", value="duplicates"),
         ]), width=12)
-    ], className="mb-4"),
+    ], className="mb-4 color: lightgray"),
 
     dbc.Row([
         dbc.Col(html.Div(id="tab-content"), width=12)
@@ -44,8 +44,8 @@ app.layout = dbc.Container([
 
     # Boxplot Dropdown & Graph (Always in Layout, Hidden Initially)
     dbc.Row([
-        dbc.Col(dcc.Dropdown(id="boxplot-column", placeholder="Select a Numeric Column", style={"display": "none"}), width=6),
-    ], className="mb-3"),
+        dbc.Col(dcc.Dropdown(id="boxplot-column", placeholder="Select a Numeric Column", style={"display": "none","color":"black"}), width=6),
+    ], className="mb-3 color: black font-weight-bold"),
 
     dbc.Row([
         dbc.Col(dcc.Graph(id="boxplot-graph", style={"display": "none"}), width=12)
@@ -73,15 +73,15 @@ def render_tab(selected_tab, contents):
     df = parse_contents(contents)
     num_cols = df.select_dtypes(include=["number"]).columns.tolist()
     column_options = [{"label": col, "value": col} for col in num_cols]
-
+    
     if selected_tab == "overview":
         return html.Div([
             html.H3("Dataset Overview"),
             dash_table.DataTable(
                 data=df.head().to_dict("records"),
                 columns=[{"name": i, "id": i} for i in df.columns],
-                style_table={"overflowX": "auto","color": "lightgray"},
-                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold","color": "lightgray"},
+                style_table={"overflowX": "auto","color": "black"},
+                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold","color": "black"},
                 page_size=5
             ),
             html.H5(f"Total Rows: {df.shape[0]} | Total Columns: {df.shape[1]}")
@@ -93,13 +93,13 @@ def render_tab(selected_tab, contents):
         return dcc.Graph(figure=fig), [], {"display": "none"}
 
     elif selected_tab == "boxplots":
-        return html.Div([html.H3("Boxplots for Outlier Detection")]), column_options, {"display": "block"}
+        return html.Div([html.H3("Boxplots for Outlier Detection")]), column_options, {"display": "block","color":"black"}
 
     elif selected_tab == "missing":
         missing_data = df.isnull().sum().reset_index()
         missing_data.columns = ["Feature", "Missing Values"]
         fig = px.bar(missing_data, x="Feature", y="Missing Values", color="Missing Values", title="Missing Values Count")
-        return dcc.Graph(figure=fig), [], {"display": "none"}
+        return dcc.Graph(figure=fig), [], {"display": "none","color":"black","font-weight":"bold"}
 
     elif selected_tab == "duplicates":
         duplicate_count = df.duplicated().sum()
@@ -108,11 +108,11 @@ def render_tab(selected_tab, contents):
             dash_table.DataTable(
                 data=df[df.duplicated()].to_dict("records"),
                 columns=[{"name": i, "id": i} for i in df.columns],
-                style_table={"overflowX": "auto"},
-                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold"},
+                style_table={"overflowX": "auto","color": "black","font-weight":"bold"},
+                style_header={"backgroundColor": "rgb(230, 230, 230)", "fontWeight": "bold", "color": "black"},
                 page_size=5
             ) if duplicate_count > 0 else html.P("No duplicate records found.", className="text-success")
-        ]), [], {"display": "none"}
+        ]), [], {"display": "none" ,"color":"black","font-weight":"bold"}
 
     return html.Div("Tab Not Found", className="alert alert-danger text-center"), [], {"display": "none"}
 
